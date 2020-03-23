@@ -19,10 +19,20 @@ echo "${board[3]} | ${board[4]} | ${board[5]}"
 echo "----------"
 echo "${board[6]} | ${board[7]} | ${board[8]}"
 
+#Assigning the letter in the game.
 echo " "
 case $((RANDOM%2)) in
 			0)
 			echo "You have assigned : " $O ;;
 			1)
 			echo "You have assigned : " $X ;;
+esac
+
+#Who plays first in game
+echo " "
+case $((RANDOM%2)) in
+			0)
+			echo "You play first" ;;
+			1)
+			echo "Computer play first" ;;
 esac
