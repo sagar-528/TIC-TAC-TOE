@@ -25,20 +25,21 @@ echo "${board[6]} | ${board[7]} | ${board[8]}"
 function getLetter(){
 case $((RANDOM%2)) in
 			0)
-				playerSign=$X ;;
+				playerSign=$X
+				computerLetter=$O ;;
 			1)
-				playerSign=$O ;;
+				playerSign=$O 
+				computerLetter=$X ;;
 esac
-echo $playerSign
 }
 
 #Who plays first in game
 function player(){
 case $((RANDOM%2)) in
 			0)
-			echo "You play first" ;;
+				echo "You play first" ;;
 			1)
-			echo "Computer play first" ;;
+				echo "Computer play first" ;;
 esac
 }
 
@@ -105,10 +106,44 @@ else
 			result="change"
 	fi
 fi
-
 echo $result 
 }
-letter="$(getLetter)"
-player
-playerTurn $letter
-checkWin $playerSign
+
+function computerTurn(){
+computerLetter=$1
+choose=$((RANDOM%9))
+	if [[ "{board[$choose]}"!=X && "${board[$choose]}"!=O ]]
+	then
+			echo "Computer turn"
+			board[$choose]="$computerLetter"
+			displayBoard
+	else
+		computerTurn $computerLetter
+	fi
+}
+displayBoard
+getLetter
+chance="$(player)"
+#checkWin $playerSign
+
+flag=0
+if [[ "$chance"=="Computer plays First" ]]
+then
+		falg=1
+fi
+
+while((1))
+do
+	if [[ $flag%2==0 ]]
+	then
+		computerTurn $computerLetter
+		result="$(checkWin $computerLetter)"
+		if [[ $result=="wins" || $result=="draw" ]]
+		then
+			echo "player " $result 
+			echo " "
+			break
+		fi
+	fi
+	flag=$((flag+1))
+done
