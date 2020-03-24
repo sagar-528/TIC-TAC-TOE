@@ -9,100 +9,99 @@ X="X"
 O="O"
 IS_EMPTY=" "
 
-declare -a board
-board=("0" "1" "2" "3" "4" "5" "6" "7" "8")
-echo "Welcome to Tic Tac Toe"
-echo " "
+declare -a gameBoard
+gameBoard=("0" "1" "2" "3" "4" "5" "6" "7" "8")
+printf "Welcome to Tic Tac Toe\n"
 
 #Setting Board
 function displayBoard(){
-echo "${board[0]} | ${board[1]} | ${board[2]}"
+echo "${gameBoard[0]} | ${gameBoard[1]} | ${gameBoard[2]}"
 echo "----------"
-echo "${board[3]} | ${board[4]} | ${board[5]}"
+echo "${gameBoard[3]} | ${gameBoard[4]} | ${gameBoard[5]}"
 echo "----------"
-echo "${board[6]} | ${board[7]} | ${board[8]}"
+echo "${gameBoard[6]} | ${gameBoard[7]} | ${gameBoard[8]}"
 }
 
 #Assigning the letter in the game.
-function getLetter(){
+function assignLetter(){
 case $((RANDOM%2)) in
 			0)
-				playerSign=$X
+				playerLetter=$X
 				computerLetter=$O ;;
 			1)
-				playerSign=$O 
+				playerLetter=$O 
 				computerLetter=$X ;;
 esac
 }
 
 #Who plays first in game
-function player(){
+function firstChance(){
 case $((RANDOM%2)) in
 			0)
-				echo "You play first" ;;
+				echo "playerChance" ;;
 			1)
-				echo "Computer play first" ;;
+				echo "computerChance" ;;
 esac
 }
 
 #Choose the valid cells
 function playerTurn(){
-playerSign=$1
-read -p "Enter the cells between 0 to 8: " choose
-if [[ $choose>=0 && $choose<=8 ]]
+playerLetter=$1
+echo "Enter the cells between 0 to 8: " 
+read response
+if [[ $response>=0 && $response<=8 ]]
 then
-	if [[ "${board[$choose]}"!=X || "${board[$choose]}"!=O ]]
+	if [[ "${gameBoard[$response]}"!=X || "${gameBoard[$response]}"!=O ]]
 	then
-			board[$choose]="$playerSign"
+			gameBoard[$response]="$playerLetter"
+			displayBoard
 	else
-			playerTurn $playerSign
+			playerTurn $playerLetter
 	fi
 else
-	printf "Invalid input"
+	printf "Invalid input\n"
 fi
-echo " "
-displayBoard
 }
 
 #Determining condition for winning or tie or change the turn
 function checkWin(){
 letter=$1
 
-if [ "${board[0]}${board[1]}${board[2]}" == "$letter$letter$letter" ]
+if [[ "${gameBoard[0]}"==$letter && "${gameBoard[1]}"==$letter && "${gameBoard[2]}"==$letter ]]
 then
-		result="Win"
-elif [ "${board[3]}${board[4]}${board[5]}" == "$letter$letter$letter" ]
+		result="Wins"
+elif [[ "${gameBoard[3]}"==$letter && "${gameBoard[4]}"==$letter && "${gameBoard[5]}"==$letter ]]
 then
-		result="Win"
-elif [ "${board[6]}${board[7]}${board[8]}" == "$letter$letter$letter" ]
+      result="Wins"
+elif [[ "${gameBoard[6]}"==$letter && "${gameBoard[7]}"==$letter && "${gameBoard[8]}"==$letter ]]
 then
-		result="Win"
-elif [ "${board[0]}${board[3]}${board[6]}" == "$letter$letter$letter" ]
+      result="Wins"
+elif [[ "${gameBoard[0]}"==$letter && "${gameBoard[3]}"==$letter && "${gameBoard[6]}"==$letter ]]
 then
-		result="Win"
-elif [ "${board[1]}${board[4]}${board[7]}" == "$letter$letter$letter" ]
+      result="Wins"
+elif [[ "${gameBoard[1]}"==$letter && "${gameBoard[4]}"==$letter && "${gameBoard[7]}"==$letter ]]
 then
-		result="Win"
-elif [ "${board[2]}${board[5]}${board[8]}" == "$letter$letter$letter" ]
+      result="Wins"
+elif [[ "${gameBoard[2]}"==$letter && "${gameBoard[5]}"==$letter && "${gameBoard[8]}"==$letter ]]
 then
-		result="Win"
-elif [ "${board[0]}${board[4]}${board[8]}" == "$letter$letter$letter" ]
+      result="Wins"
+elif [[ "${gameBoard[0]}"==$letter && "${gameBoard[4]}"==$letter && "${gameBoard[8]}"==$letter ]]
 then
-		result="Win"
-elif [ "${board[2]}${board[4]}${board[6]}" == "$letter$letter$letter" ]
+      result="Wins"
+elif [[ "${gameBoard[2]}"==$letter && "${gameBoard[4]}"==$letter && "${gameBoard[6]}"==$letter ]]
 then
-		result="Win"
+      result="Wins"
 else
 		flag=0
-		for((counter=0; counter<${#board[@]}; counter++))
+		for((index=0; index<${#gameBoard[@]}; index++))
 		do
-			if [[ "${board[$choose]}"!=X  || "${board[$choose]}"!=O ]]
+			if [[ "${gameBoard[letter]}"!=X  || "${gameBoard[letter]}"!=O ]]
 			then
 					flag=1
 			fi
 		done
 
-	if [ $flag == 0 ]
+	if [ $flag==0 ]
 	then
 			result="draw"
 	else
@@ -114,97 +113,182 @@ echo $result
 
 function computerTurn(){
 computerLetter=$1
-choose=$((RANDOM%9))
-	if [[ "{board[$choose]}"!=X && "${board[$choose]}"!=O ]]
+playerLetter=$2
+compPlay=0
+checkWinningMove $computerLetter
+if(($compPlay==0))
+then
+	blockPlayerWin $playerLetter $computerLetter
+fi
+
+if(($compPlay==0))
+then
+	read response
+#response=$((RANDOM%9))
+#IF NO VALUE IS ASSIGN TO THE INDEX GO AHEAD ELSE RETURN FUNCTION
+	if [[ "{gameBoard[$response]}"!=X && "${gameBoard[$response]}"!=O ]]
 	then
-			echo "Computer turn"
-			board[$choose]="$computerLetter"
-			echo " "
-			displayBoard
+			echo "Computer turn: "
+			gameBoard[$response]="$computerLetter"
 	else
 		computerTurn $computerLetter
 	fi
+fi
+displayBoard
 }
+
 
 function checkWinningMove(){
 	local letter=$1
 	index=0
 while(($index<8))
 do
-	if [[ ${board[$index]} == $letter && ${board[$((index+1))]} == $letter && ${board[$((index+2))]} == $IS_EMPTY ]]
+	if [[ ${gameBoard[$index]} == $letter && ${gameBoard[$((index+1))]} == $letter && ${gameBoard[$((index+2))]} == $IS_EMPTY ]]
 	then
-			board[$((index+2))]=$letter
+			gameBoard[$((index+2))]=$letter
 			compPlay=1
 			return
-		elif [[ ${board[$index]} == $letter && ${board[$((index+2))]} == $letter && ${board[$((index+1))]} == $IS_EMPTY ]]
+		elif [[ ${gameBoard[$index]} == $letter && ${gameBoard[$((index+2))]} == $letter && ${gameBoard[$((index+1))]} == $IS_EMPTY ]]
       then
-         board[$((index+1))]=$letter
+         gameBoard[$((index+1))]=$letter
          compPlay=1
          return
-		elif [[ ${board[$((index+2))]} == $letter && ${board[$((index+1))]} == $letter && ${board[$index]} == $IS_EMPTY ]]
+		elif [[ ${gameBoard[$((index+2))]} == $letter && ${gameBoard[$((index+1))]} == $letter && ${gameBoard[$index]} == $IS_EMPTY ]]
       then
-         board[$index]=$letter
+         gameBoard[$index]=$letter
          compPlay=1
          return
-		elif [[ ${board[$index]} == $letter && ${board[$((index+3))]} == $letter && ${board[$((index+6))]} == $IS_EMPTY ]]
+		elif [[ ${gameBoard[$index]} == $letter && ${gameBoard[$((index+3))]} == $letter && ${gameBoard[$((index+6))]} == $IS_EMPTY ]]
       then
-         board[$((index+6))]=$letter
+         gameBoard[$((index+6))]=$letter
          compPlay=1
          return
-		elif [[ ${board[$index]} == $letter && ${board[$((index+6))]} == $letter && ${board[$((index+3))]} == $IS_EMPTY ]]
+		elif [[ ${gameBoard[$index]} == $letter && ${gameBoard[$((index+6))]} == $letter && ${gameBoard[$((index+3))]} == $IS_EMPTY ]]
       then
-         board[$((index+3))]=$letter
+         gameBoard[$((index+3))]=$letter
          compPlay=1
          return
-		elif [[ ${board[$((index+3))]} == $letter && ${board[$((index+6))]} == $letter && ${board[$index]} == $IS_EMPTY ]]
+		elif [[ ${gameBoard[$((index+3))]} == $letter && ${gameBoard[$((index+6))]} == $letter && ${gameBoard[$index]} == $IS_EMPTY ]]
       then
-         board[$index]=$letter
+         gameBoard[$index]=$letter
          compPlay=1
          return
 	fi
 		index=$((index+3))
 done
-	if [[ ${board[0]} == $letter && ${board[8]} == $letter && ${board[4]} == $IS_EMPTY ]]
+	if [[ ${gameBoard[0]} == $letter && ${gameBoard[8]} == $letter && ${gameBoard[4]} == $IS_EMPTY ]]
    then
-			board[4]=$letter
+			gameBoard[4]=$letter
 			compPlay=1
    	   return
-		elif [[ ${board[0]} == $letter && ${board[4]} == $letter && ${board[8]} == $IS_EMPTY ]]
+		elif [[ ${gameBoard[0]} == $letter && ${gameBoard[4]} == $letter && ${gameBoard[8]} == $IS_EMPTY ]]
       then
-         board[8]=$letter
+         gameBoard[8]=$letter
          compPlay=1
          return
-		elif [[ ${board[8]} == $letter && ${board[4]} == $letter && ${board[0]} == $IS_EMPTY ]]
+		elif [[ ${GameBoard[8]} == $letter && ${gameBoard[4]} == $letter && ${gameBoard[0]} == $IS_EMPTY ]]
       then
-         board[0]=$letter
+         gameBoard[0]=$letter
          compPlay=1
          return
-		elif [[ ${board[2]} == $letter && ${board[4]} == $letter && ${board[6]} == $IS_EMPTY ]]
+		elif [[ ${gameBoard[2]} == $letter && ${gameBoard[4]} == $letter && ${gameBoard[6]} == $IS_EMPTY ]]
       then
-         board[6]=$letter
+         gameBoard[6]=$letter
          compPlay=1
          return
-		elif [[ ${board[2]} == $letter && ${board[6]} == $letter && ${board[4]} == $IS_EMPTY ]]
+		elif [[ ${gameBoard[2]} == $letter && ${gameBoard[6]} == $letter && ${gameBoard[4]} == $IS_EMPTY ]]
       then
-         board[4]=$letter
+         gameBoard[4]=$letter
          compPlay=1
          return
-		elif [[ ${board[4]} == $letter && ${board[6]} == $letter && ${board[2]} == $IS_EMPTY ]]
+		elif [[ ${gameBoard[4]} == $letter && ${gameBoard[6]} == $letter && ${gameBoard[2]} == $IS_EMPTY ]]
       then
-         board[2]=$letter
+         gameBoard[2]=$letter
          compPlay=1
          return
 	fi
 }
-displayBoard
-getLetter
-chance="$(player)"
-flag=0
-if [[ "$chance"=="Computer plays First" ]]
-then
-		falg=1
-fi
 
+function blockPlayerWin(){
+	compPlay=0
+   letter=$1
+	computerLetter=$2
+   index=0
+while(($index<8))
+do
+   if [[ ${gameBoard[$index]} == $letter && ${gameBoard[$((index+1))]} == $letter && ${gameBoard[$((index+2))]} == $IS_EMPTY ]]
+   then
+         gameBoard[$((index+2))]=$letter
+         compPlay=1
+         return
+      elif [[ ${gameBoard[$index]} == $letter && ${gameBoard[$((index+2))]} == $letter && ${gameBoard[$((index+1))]} == $IS_EMPTY ]]
+      then
+         gameBoard[$((index+1))]=$letter
+         compPlay=1
+         return
+      elif [[ ${gameBoard[$((index+2))]} == $letter && ${gameBoard[$((index+1))]} == $letter && ${gameBoard[$index]} == $IS_EMPTY ]]
+      then
+         gameBoard[$index]=$letter
+         compPlay=1
+         return
+      elif [[ ${gameBoard[$index]} == $letter && ${gameBoard[$((index+3))]} == $letter && ${gameBoard[$((index+6))]} == $IS_EMPTY ]]
+      then
+         gameBoard[$((index+6))]=$letter
+         compPlay=1
+         return
+		 elif [[ ${gameBoard[$index]} == $letter && ${gameBoard[$((index+6))]} == $letter && ${gameBoard[$((index+3))]} == $IS_EMPTY ]]
+      then
+         gameBoard[$((index+3))]=$letter
+         compPlay=1
+         return
+		  elif [[ ${gameBoard[$((index+3))]} == $letter && ${gameBoard[$((index+6))]} == $letter && ${gameBoard[$index]} == $IS_EMPTY ]]
+      then
+         gameBoard[$index]=$letter
+         compPlay=1
+         return
+   fi
+      index=$((index+3))
+done
+   if [[ ${gameBoard[0]} == $letter && ${gameBoard[8]} == $letter && ${gameBoard[4]} == $IS_EMPTY ]]
+   then
+         gameBoard[4]=$letter
+         compPlay=1
+         return
+		  elif [[ ${gameBoard[0]} == $letter && ${gameBoard[4]} == $letter && ${gameBoard[8]} == $IS_EMPTY ]]
+      then
+         gameBoard[8]=$letter
+         compPlay=1
+         return
+      elif [[ ${gameBoard[8]} == $letter && ${gameBoard[4]} == $letter && ${gameBoard[0]} == $IS_EMPTY ]]
+      then
+         gameBoard[0]=$letter
+         compPlay=1
+         return
+      elif [[ ${gameBoard[2]} == $letter && ${gameBoard[4]} == $letter && ${gameBoard[6]} == $IS_EMPTY ]]
+      then
+         gameBoard[6]=$letter
+         compPlay=1
+         return
+      elif [[ ${gameBoard[2]} == $letter && ${gameBoard[6]} == $letter && ${gameBoard[4]} == $IS_EMPTY ]]
+      then
+         gameBoard[4]=$letter
+         compPlay=1
+         return
+		     elif [[ ${gameBoard[4]} == $letter && ${gameBoard[6]} == $letter && ${gameBoard[2]} == $IS_EMPTY ]]
+      then
+         gameBoard[2]=$letter
+         compPlay=1
+         return
+   fi
+}
+
+function alternatePlay(){
+chance="$(firstChance)"
+flag=0
+if [[ "$chance" == "computerChance" ]]
+then
+		flag=1
+fi
 while((0==0))
 do
 	if [[ $flag%2==0 ]]
@@ -213,10 +297,21 @@ do
 		result="$(checkWin $computerLetter)"
 		if [[ $result=="wins" || $result=="draw" ]]
 		then
-			echo "player " $result 
-			echo " "
+			printf "computer $result\n"
 			break
 		fi
+	else
+	playerTurn $playerLetter
+	result="$(checkWin $playerLetter)"
+	if [[$result=="wins" || $result=="draw" ]]
+	then
+			printf "player $result\n"
+			break
 	fi
-	flag=$((flag+1))
+	fi
+		flag=$((flag+1))
 done
+}
+displayBoard
+assignLetter
+alternatePlay
