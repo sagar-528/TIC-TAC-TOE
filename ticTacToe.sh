@@ -22,7 +22,6 @@ echo "----------"
 echo "${gameBoard[6]} | ${gameBoard[7]} | ${gameBoard[8]}"
 }
 
-
 #Choose the valid cells
 function playerTurn(){
 playerLetter=$1
@@ -89,6 +88,15 @@ function fillConers()
 	esac
 }
 
+function takeCenter(){
+computerLetter=$1
+compPlay=0
+if [[ ${gameBoard[4]}==$IS_EMPTY ]]
+then
+		gameBoard[4]=$computerLetter
+		compPlay=1
+fi
+}
 
 #Determining condition for winning or tie or change the turn
 function checkWin(){
