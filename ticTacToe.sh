@@ -98,6 +98,55 @@ then
 fi
 }
 
+function takeSides()
+{
+	local letter=$1
+	compPlay=0
+	randomCorner=$((RANDOM%4))
+	case $randomCorner in
+	0)
+		if [[ ${gameBoard[1]}==$IS_EMPTY ]]
+		then
+			gameBoard[1]=$letter
+			compPlay=1
+			return
+		else
+			fillCorners $letter
+		fi
+	;;
+	1)
+		if [[ ${gameBoard[3]}==$IS_EMPTY ]]
+		then
+			gameBoard[3]=$letter
+			compPlay=1
+			return
+		else
+			fillCorners $letter
+		fi
+	;;
+	2)
+		if [[ ${gameBoard[5]}==$IS_EMPTY ]]
+		then
+			gameBoard[5]=$letter
+			compPlay=1
+			return
+		else
+			fillCorners $letter
+		fi 
+	;;
+	3)
+		if [[ ${gameBoard[7]}==$IS_EMPTY ]]
+		then
+			gameBoard[7]=$letter
+			compPlay=1
+			return
+		else
+			fillCorners $letter
+		fi
+	;;
+	esac
+}
+
 #Determining condition for winning or tie or change the turn
 function checkWin(){
 letter=$1
@@ -294,6 +343,7 @@ function computerTurn(){
 computerLetter=$1
 playerLetter=$2
 compPlay=0
+echo "Computer Turn"
 checkWinningMove $computerLetter
 if(($compPlay==0))
 then
@@ -302,19 +352,15 @@ fi
 
 if(($compPlay==0))
 then
-		takeCenter $computer
+		fillConers $computerLetter
 fi
 if(($compPlay==0))
 then
-response=$((RANDOM%9))
-#IF NO VALUE IS ASSIGN TO THE INDEX GO AHEAD ELSE RETURN FUNCTION
-	if [[ "{gameBoard[$response]}"!=X && "${gameBoard[$response]}"!=O ]]
-	then
-			echo "Computer turn: "
-			gameBoard[$response]="$computerLetter"
-	else
-		computerTurn $computerLetter
-	fi
+		takeCenter $computerLetter
+fi
+if(($compPlay==0))
+then
+	takeSides $computerLetter
 fi
 displayBoard
 }
