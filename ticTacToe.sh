@@ -22,27 +22,6 @@ echo "----------"
 echo "${gameBoard[6]} | ${gameBoard[7]} | ${gameBoard[8]}"
 }
 
-#Assigning the letter in the game.
-function assignLetter(){
-case $((RANDOM%2)) in
-			0)
-				playerLetter=$X
-				computerLetter=$O ;;
-			1)
-				playerLetter=$O 
-				computerLetter=$X ;;
-esac
-}
-
-#Who plays first in game
-function firstChance(){
-case $((RANDOM%2)) in
-			0)
-				echo "playerChance" ;;
-			1)
-				echo "computerChance" ;;
-esac
-}
 
 #Choose the valid cells
 function playerTurn(){
@@ -62,6 +41,54 @@ else
 	printf "Invalid input\n"
 fi
 }
+
+function fillConers()
+{
+	local letter=$1
+	compPlay=0
+	case $((RANDOM%4)) in
+		0)
+			if [[ ${gameBoard[0]}==$IS_EMPTY ]]
+			then
+					gameBoard[0]=$computerLetter
+					compPlay=1
+					return
+			else
+					fillConers	$letter
+			fi ;;
+
+		1)
+			 if [[ ${gameBoard[2]}==$IS_EMPTY ]]
+         then
+               gameBoard[2]=$computerLetter
+               compPlay=1
+               return
+         else
+               fillConers  $letter
+         fi ;;
+
+		2)
+			 if [[ ${gameBoard[6]}==$IS_EMPTY ]]
+         then
+               gameBoard[6]=$computerLetter
+               compPlay=1
+               return
+         else
+               fillConers  $letter
+         fi	;;
+
+		3)
+			 if [[ ${gameBoard[8]}==$IS_EMPTY ]]
+         then
+               gameBoard[2]=$computerLetter
+               compPlay=1
+               return
+         else
+               fillConers  $letter
+         fi
+	esac
+}
+
 
 #Determining condition for winning or tie or change the turn
 function checkWin(){
@@ -110,33 +137,6 @@ else
 fi
 echo $result 
 }
-
-function computerTurn(){
-computerLetter=$1
-playerLetter=$2
-compPlay=0
-checkWinningMove $computerLetter
-if(($compPlay==0))
-then
-	blockPlayerWin $playerLetter $computerLetter
-fi
-
-if(($compPlay==0))
-then
-	read response
-#response=$((RANDOM%9))
-#IF NO VALUE IS ASSIGN TO THE INDEX GO AHEAD ELSE RETURN FUNCTION
-	if [[ "{gameBoard[$response]}"!=X && "${gameBoard[$response]}"!=O ]]
-	then
-			echo "Computer turn: "
-			gameBoard[$response]="$computerLetter"
-	else
-		computerTurn $computerLetter
-	fi
-fi
-displayBoard
-}
-
 
 function checkWinningMove(){
 	local letter=$1
@@ -282,10 +282,39 @@ done
    fi
 }
 
+function computerTurn(){
+computerLetter=$1
+playerLetter=$2
+compPlay=0
+checkWinningMove $computerLetter
+if(($compPlay==0))
+then
+	blockPlayerWin $playerLetter $computerLetter
+fi
+
+if(($compPlay==0))
+then
+		takeCenter $computer
+fi
+if(($compPlay==0))
+then
+response=$((RANDOM%9))
+#IF NO VALUE IS ASSIGN TO THE INDEX GO AHEAD ELSE RETURN FUNCTION
+	if [[ "{gameBoard[$response]}"!=X && "${gameBoard[$response]}"!=O ]]
+	then
+			echo "Computer turn: "
+			gameBoard[$response]="$computerLetter"
+	else
+		computerTurn $computerLetter
+	fi
+fi
+displayBoard
+}
+
 function alternatePlay(){
-chance="$(firstChance)"
+chance=$firstChance
 flag=0
-if [[ "$chance" == "computerChance" ]]
+if [[ "$chance"=="computerChance" ]]
 then
 		flag=1
 fi
@@ -312,6 +341,29 @@ do
 		flag=$((flag+1))
 done
 }
+
+#Assigning the letter in the game.
+function assignLetter(){
+case $((RANDOM%2)) in
+			0)
+				playerLetter=$X
+				computerLetter=$O ;;
+			1)
+				playerLetter=$O 
+				computerLetter=$X ;;
+esac
+}
+
+#Who plays first in game
+function firstChance(){
+case $((RANDOM%2)) in
+			0)
+				echo "playerChance" ;;
+			1)
+				echo "computerChance" ;;
+esac
+}
+
 displayBoard
 assignLetter
 alternatePlay
